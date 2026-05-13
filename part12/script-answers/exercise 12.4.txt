@@ -1,0 +1,21 @@
+docker run -it ubuntu bash
+
+apt update
+
+apt install -y curl
+
+curl -sL https://deb.nodesource.com/setup_20.x | bash
+
+apt install -y nodejs
+
+node -v
+
+mkdir -p /usr/src/app
+
+apt install -y nano
+
+nano /usr/src/app/index.js
+
+node /usr/src/app/index.js
+
+exit
