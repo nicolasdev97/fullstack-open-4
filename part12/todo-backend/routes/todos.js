@@ -1,6 +1,7 @@
 const express = require('express');
 const { Todo } = require('../mongo')
 const router = express.Router();
+const singleRouter = express.Router({ mergeParams: true });
 
 /* GET todos listing. */
 router.get('/', async (_, res) => {
@@ -17,8 +18,6 @@ router.post('/', async (req, res) => {
   res.send(todo);
 });
 
-const singleRouter = express.Router();
-
 const findByIdMiddleware = async (req, res, next) => {
   const { id } = req.params
   req.todo = await Todo.findById(id)
@@ -29,18 +28,32 @@ const findByIdMiddleware = async (req, res, next) => {
 
 /* DELETE todo. */
 singleRouter.delete('/', async (req, res) => {
-  await req.todo.delete()  
+  await req.todo.delete()
   res.sendStatus(200);
 });
 
 /* GET todo. */
 singleRouter.get('/', async (req, res) => {
-  res.sendStatus(405); // Implement this
+  console.log(req.params.id)
+  const todo = await Todo.findById(req.params.id)
+
+
+  if (todo) {
+    res.json(todo)
+  } else {
+    res.sendStatus(404)
+  }
 });
 
 /* PUT todo. */
 singleRouter.put('/', async (req, res) => {
-  res.sendStatus(405); // Implement this
+  const todo = await Todo.findByIdAndUpdate(
+    req.params.id,
+    req.body,
+    { new: true }
+  )
+
+  res.json(todo)
 });
 
 router.use('/:id', findByIdMiddleware, singleRouter)
