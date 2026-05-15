@@ -3,6 +3,8 @@ const { Todo } = require('../mongo')
 const router = express.Router();
 const singleRouter = express.Router({ mergeParams: true });
 
+const { get, set } = require('../redis')
+
 /* GET todos listing. */
 router.get('/', async (_, res) => {
   const todos = await Todo.find({})
@@ -15,7 +17,16 @@ router.post('/', async (req, res) => {
     text: req.body.text,
     done: false
   })
-  res.send(todo);
+
+  const addedTodos = await get('added_todos')
+
+  const newAmount = addedTodos
+    ? Number(addedTodos) + 1
+    : 1
+
+  await set('added_todos', newAmount)
+
+  res.send(todo)
 });
 
 const findByIdMiddleware = async (req, res, next) => {
